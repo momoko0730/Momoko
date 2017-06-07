@@ -1,0 +1,24 @@
+function W=Outline4(K,rangea,rangeb,X)
+H=[];
+T=num2str(K);
+Y=['jikken',T,'.wmv'];
+V=VideoReader(Y);
+while hasFrame(V)
+    C=readFrame(V);
+    Cred=double(C(:,:,1));
+    Cgreen=double(C(:,:,2));
+    Cblue=double(C(:,:,3));
+    C1=(Cred+Cgreen+Cblue)/3;
+    C2=C1(:,rangea);
+    C2=double(C2);
+    D=C2;
+    meanD=mean(D(:));
+    D(D>meanD)=255;D(D<=meanD)=0;
+    D2=diff(D);
+    D3=abs(D2);  
+    [row,~]=find(D3(rangeb,:));
+    B=max(row)*X;
+    H=[H,B];
+end
+W=H.';
+end
