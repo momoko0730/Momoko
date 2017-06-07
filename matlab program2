@@ -1,0 +1,14 @@
+%Filename matOutline.m
+
+C3=[];
+C3(1:Z+1,:)=0;
+for I=1:N
+B=A(I:(I+Z),:);
+C1=fft(B);
+C2=(abs(C1)).^2;
+C3=C3+C2;
+end
+ M=C3/N;
+ Z2=(Z+1)/2;
+ W=M(1:Z2);
+ loglog(W(2:end))
