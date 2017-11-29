@@ -1,0 +1,37 @@
+%Filename Outline4.m
+function W=Outline4(K,rangea,rangeb,X)
+tic
+H=[];
+T=num2str(K);
+Y=['jikken',T,'.AVI'];
+V=VideoReader(Y);
+while hasFrame(V)
+    %フレームの読みとり
+    C=readFrame(V);
+    Cred=double(C(:,:,1));
+    Cgreen=double(C(:,:,2));
+    Cblue=double(C(:,:,3));
+    %グレースケール画像
+    C1=(Cred+Cgreen+Cblue)/3;
+    %横方向の画像範囲を狭める
+    C2=C1(:,rangea);
+    C2=double(C2);
+    D=C2;
+    %ピクセルの平均をとる
+    meanD=mean(D(:));
+    %平均より上か下かで白黒に変換
+    D(D>meanD)=255;D(D<=meanD)=0;
+    %差分をとって渦のOutlineを表示
+    D2=diff(D);
+    %白黒画像(差分でマイナスになったピクセルをプラスにする)
+    D3=abs(D2);
+    %それぞれの行ごとに最下点の検出
+    [row,~]=find(D3(rangeb,:));
+    %最下点の中での最大値を出す
+    B=max(row)*X;
+    %各時間ごとの最大最下点の格納
+    H=[H,B];
+end
+W=H.';
+toc
+end
