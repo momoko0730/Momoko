@@ -1,0 +1,62 @@
+%Filename Outline7.m
+%Kはjikkenのあとの数字
+%rangeaは横方向の範囲
+%Qは縦方向の範囲の終わりを見つけるために操作する最初(渦より下)の行
+%Pは縦方向の範囲の始まり
+%Xはピクセルからcm変換
+function W=Outline7(K,rangea,Q,P,X)
+tic
+H=[];
+T=num2str(K);
+Y=['jikken',T,'.AVI'];
+V=VideoReader(Y);
+while hasFrame(V)
+    %フレームの読みとり
+    C=readFrame(V);
+    Cred=double(C(:,:,1));
+    Cgreen=double(C(:,:,2));
+    Cblue=double(C(:,:,3));
+    %グレースケール画像
+    C1=(Cred+Cgreen+Cblue)/3;
+    %横方向の画像範囲を狭める
+    C2=C1(:,rangea);
+    C2=double(C2);
+    D=C2;
+    %ピクセルの平均をとる
+    meanD=mean(D(:));
+    %平均より上か下かで白黒に変換
+    D(D>meanD)=255;D(D<=meanD)=0;
+    %縦方向のdiff
+    D20=diff(D,1,1);
+    D21=abs(D20);
+    %調整必要
+    D22=D21(:,2:81);
+    %横方向のdiff
+    D23=diff(D,1,2);
+    D24=abs(D23);
+    D25=D24(2:480,:);
+    D3=255-((255-(D22)).*(255-(D25)))/255;
+    %最下点の決定↓
+    for BB=1:130
+        B4=Q-BB;
+        B10=sum(D3(B4,:),2);
+        B11=sum(D3(((B4)-1),:),2);
+        B12=sum(D3(((B4)-2),:),2);
+        B13=sum(D3(((B4)-3),:),2);
+        B14=sum(D3(((B4)-4),:),2);
+        B15=sum(D3(((B4)-5),:),2);
+        B16=sum(D3(((B4)-6),:),2);
+        B17=sum(D3(((B4)-7),:),2);
+        %B18=sum(D3(((B4)-8),:),2);
+        if (B17 > 0) && (B16 > 0) && (B15 > 0) && (B14 > 0) && (B13 > 0) && (B12 > 0) && (B11 > 0) && (B10 > 0)
+        %if (B13 > 0) && (B12 > 0) && (B11 > 0) && (B10 > 0)
+            break
+        end
+    end
+    B2=(B4)-P;
+    B3=B2*X;
+    H=[H,B3];
+end
+W=H.';
+toc
+end
